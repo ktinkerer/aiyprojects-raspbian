@@ -193,6 +193,60 @@ class RepeatAfterMe(object):
         to_repeat = voice_command.replace(self.keyword, '', 1)
         self.say(to_repeat)
 
+
+# Example: Set timer
+# ========================
+#
+# Sets a timer
+
+
+class setTimer(object):
+
+    def __init__(self, say, keyword):
+        self.say = say
+        self.keyword = keyword
+
+    def to_number(self, number_string):
+        number = {'one':1,
+                    'two':2,
+                    'three':3,
+                    'four':4,
+                    'five':5,
+                    'six':6,
+                    'seven':7,
+                    'eight':8,
+                    'nine':9,
+                    'ten':10,
+                    'eleven':11,
+                    'twelve':12,
+                    'thirteen':13,
+                    'fourteen':14,
+                    'fifteen':15,
+                    'sixteen':16,
+                    'seventeen':17,
+                    'eighteen':18,
+                    'nineteen':19,
+                    'twenty':20,
+                    }
+        return number[number_string]
+
+    def run(self, voice_command):
+
+        command = voice_command.replace(self.keyword, '', 1)
+        logging.info("received timer set command " + command )
+        length, unit = command.split(' ')
+
+        try:
+            length = float(length)
+        except (ValueError):
+            length = float(self.to_number(length))
+
+        if (unit == "minutes") or (unit == "minute"):
+            length = length * 60
+        logging.info("setting a timer for " + str(length) )
+        self.say("setting a timer for " + str(length) + " seconds")
+        t = threading.Timer(length, self.say, ["Time is up"]).start()
+
 # Power: Shutdown or reboot the pi
 # ================================
 # Shuts down the pi or reboots with a response
