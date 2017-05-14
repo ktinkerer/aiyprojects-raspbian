@@ -21,6 +21,7 @@ import vlc
 import time
 import feedparser
 import random
+import threading
 
 import actionbase
 
@@ -196,6 +197,7 @@ class RepeatAfterMe(object):
         # remove it before saying whatever is left.
         to_repeat = voice_command.replace(self.keyword, '', 1)
         self.say(to_repeat)
+
 
 # Power: Shutdown or reboot the pi
 # ================================
@@ -448,7 +450,6 @@ conflict with the First or Second Law."""))
 
 def pauseActors():
     playPodcast.pause()
-
 
 def resumeActors():
     playPodcast.resume()
