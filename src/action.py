@@ -223,6 +223,11 @@ class PowerCommand(object):
             self.say("Sorry I didn't identify that command")
 
 
+# Power: Play Podcast
+# ================================
+# Plays, pauses and resumes podcasts
+#
+
 class playPodcast(object):
 
     def __init__(self, say, keyword):
@@ -379,7 +384,6 @@ class playPodcast(object):
         podcastState = playPodcast.get_state()
         logging.info("resume podcast state is " + podcastState)
         if podcastState == "playing":
-            logging.info("resuming podcast state is playing " + podcastState)
             podcastPlayer.play()
 
 
