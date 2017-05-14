@@ -294,7 +294,6 @@ class playRadio(object):
         return radioState
 
     def get_station(self, station_name):
-        # replace the stream for the first line 'radio' with the stream for your default station
         stations = {
             '1': 'http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/uk/sbr_high/ak/bbc_radio_one.m3u8',
             '2': 'http://a.files.bbci.co.uk/media/live/manifesto/audio/simulcast/hls/uk/sbr_high/ak/bbc_radio_two.m3u8',
