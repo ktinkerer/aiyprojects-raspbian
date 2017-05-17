@@ -421,7 +421,9 @@ conflict with the First or Second Law."""))
 # =========================================
 
 def pauseActors():
+    """add your pause actions here"""
     playPodcast.pause()
 
 def resumeActors():
+    """add your resume actions here"""
     playPodcast.resume()
