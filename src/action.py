@@ -222,6 +222,7 @@ class PowerCommand(object):
 # Control mpd
 #
 
+
 class Mpd(object):
 
     def __init__(self, say, keyword):
@@ -229,7 +230,6 @@ class Mpd(object):
         self.keyword = keyword
         global mpd_client
         mpd_client = MPDClient()
-        mpd_client.timeout = 10
         mpd_client.connect('localhost', 6600)
         global mpdState
         mpdState = "None"
@@ -252,7 +252,11 @@ class Mpd(object):
 
     def pause():
         global mpdState
-        mpdState = mpd_client.status()['state']
+        try:
+            mpdState = mpd_client.status()['state']
+        except ConnectionError:
+            logging.error("Error connecting to MPD")
+            mpdState = "stopped"
         if mpdState == "play":
             mpd_client.pause()
 
@@ -328,6 +332,7 @@ conflict with the First or Second Law."""))
 def pauseActors():
     """add your resume actions here"""
     Mpd.pause()
+
 
 def resumeActors():
     """add your pause actions here"""
