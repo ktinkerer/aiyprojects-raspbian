@@ -17,6 +17,7 @@
 import datetime
 import logging
 import subprocess
+from mpd import MPDClient
 
 import actionbase
 
@@ -216,6 +217,32 @@ class PowerCommand(object):
             logging.error("Error identifying power command.")
             self.say("Sorry I didn't identify that command")
 
+# Mpd commands
+# ================================
+# Control mpd
+#
+
+class Mpd(object):
+
+    def __init__(self, say, keyword):
+        self.say = say
+        self.keyword = keyword
+        self.client = MPDClient()
+        self.client.timeout = 10
+        self.client.connect('localhost', 6600)
+
+    def run(self, voice_command):
+
+        voice_command = ((voice_command.replace(self.keyword, '', 1)).strip()).lower()
+
+        if (voice_command == "play"):
+            self.say("Playing mpd")
+            self.client.play()
+        else:
+            logging.error("Error identifying mpd command.")
+            self.say("Sorry I didn't identify that command")
+
+
 # =========================================
 # Makers! Implement your own actions here.
 # =========================================
@@ -244,6 +271,7 @@ def make_actor(say):
 
     actor.add_keyword(_('power off'), PowerCommand(say, 'shutdown'))
     actor.add_keyword(_('reboot'), PowerCommand(say, 'reboot'))
+    actor.add_keyword(_('music'), Mpd(say, 'music'))
 
     return actor
 
