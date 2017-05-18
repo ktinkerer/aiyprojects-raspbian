@@ -227,21 +227,38 @@ class Mpd(object):
     def __init__(self, say, keyword):
         self.say = say
         self.keyword = keyword
-        self.client = MPDClient()
-        self.client.timeout = 10
-        self.client.connect('localhost', 6600)
+        global mpd_client
+        mpd_client = MPDClient()
+        mpd_client.timeout = 10
+        mpd_client.connect('localhost', 6600)
+        global mpdState
+        mpdState = "None"
 
     def run(self, voice_command):
 
         voice_command = ((voice_command.replace(self.keyword, '', 1)).strip()).lower()
 
-        if (voice_command == "play"):
-            self.say("Playing mpd")
-            self.client.play()
+        if voice_command == "play":
+            logging.info("Playing mpd")
+            mpd_client.play()
+        elif (voice_command == "stop") or (voice_command == "off"):
+            logging.info("Stopping mpd")
+            mpd_client.stop()
+            global mpdState
+            mpdState = "stopped"
         else:
             logging.error("Error identifying mpd command.")
             self.say("Sorry I didn't identify that command")
 
+    def pause():
+        global mpdState
+        mpdState = mpd_client.status()['state']
+        if mpdState == "play":
+            mpd_client.pause()
+
+    def resume():
+        if mpdState == "play":
+            mpd_client.pause()
 
 # =========================================
 # Makers! Implement your own actions here.
@@ -310,6 +327,8 @@ conflict with the First or Second Law."""))
 
 def pauseActors():
     """add your resume actions here"""
+    Mpd.pause()
 
 def resumeActors():
     """add your pause actions here"""
+    Mpd.resume()
