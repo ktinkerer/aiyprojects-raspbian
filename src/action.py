@@ -17,6 +17,7 @@
 import datetime
 import logging
 import subprocess
+import paho.mqtt.client as mqtt
 
 import actionbase
 
@@ -216,6 +217,45 @@ class PowerCommand(object):
             logging.error("Error identifying power command.")
             self.say("Sorry I didn't identify that command")
 
+# Mosquitto
+# ================================
+# Send MQTT commands
+#
+
+class Mosquitto(object):
+    """Send MQTT commands"""
+
+    def __init__(self, say, keyword):
+        self.say = say
+        self.keyword = keyword
+        #self.client = mqtt.Client
+        self.mqtt_host = "host ip address"
+        self.mqtt_port = "1883"
+        self.mqtt_username = ""
+        self.mqtt_password = ""
+        self.lights_topic = "livingroom/lights"
+
+    def run(self, voice_command):
+        if (self.keyword == "lights on"):
+            self.say("lights on")
+            mqtt.publish.single(self.lights_topic, "on",
+                                hostname=self.mqtt_host,
+                                port=self.mqtt_port,
+                                auth = {'username':self.mqtt_username,
+                                        'password':self.mqtt_password})
+
+        elif (self.keyword == "lights off"):
+            self.say("lights off")
+            mqtt.publish.single(self.lights_topic, "off",
+                                hostname=self.mqtt_host,
+                                port=self.mqtt_port,
+                                auth = {'username':self.mqtt_username,
+                                        'password':self.mqtt_password})
+
+        else:
+            logging.error("Error identifying power command.")
+            self.say("Sorry I didn't identify that command")
+
 # =========================================
 # Makers! Implement your own actions here.
 # =========================================
@@ -244,6 +284,8 @@ def make_actor(say):
 
     actor.add_keyword(_('power off'), PowerCommand(say, 'shutdown'))
     actor.add_keyword(_('reboot'), PowerCommand(say, 'reboot'))
+    actor.add_keyword(_('lights on'), Mosquitto(say, 'lights on'))
+    actor.add_keyword(_('lights off'), Mosquitto(say, 'lights off'))
 
     return actor
 
