@@ -17,7 +17,7 @@
 import datetime
 import logging
 import subprocess
-import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 
 import actionbase
 
@@ -228,9 +228,8 @@ class Mosquitto(object):
     def __init__(self, say, keyword):
         self.say = say
         self.keyword = keyword
-        #self.client = mqtt.Client
         self.mqtt_host = "host ip address"
-        self.mqtt_port = "1883"
+        self.mqtt_port = 1883
         self.mqtt_username = ""
         self.mqtt_password = ""
         self.lights_topic = "livingroom/lights"
@@ -238,22 +237,22 @@ class Mosquitto(object):
     def run(self, voice_command):
         if (self.keyword == "lights on"):
             self.say("lights on")
-            mqtt.publish.single(self.lights_topic, "on",
+            publish.single(self.lights_topic, payload="on",
                                 hostname=self.mqtt_host,
                                 port=self.mqtt_port,
-                                auth = {'username':self.mqtt_username,
+                                auth={'username':self.mqtt_username,
                                         'password':self.mqtt_password})
 
         elif (self.keyword == "lights off"):
             self.say("lights off")
-            mqtt.publish.single(self.lights_topic, "off",
+            publish.single(self.lights_topic, payload="off",
                                 hostname=self.mqtt_host,
                                 port=self.mqtt_port,
-                                auth = {'username':self.mqtt_username,
+                                auth={'username':self.mqtt_username,
                                         'password':self.mqtt_password})
 
         else:
-            logging.error("Error identifying power command.")
+            logging.error("Error identifying mqtt command.")
             self.say("Sorry I didn't identify that command")
 
 # =========================================
