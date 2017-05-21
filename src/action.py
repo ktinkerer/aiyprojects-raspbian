@@ -255,12 +255,13 @@ class playPodcast(object):
             'this week in tech': 'http://feeds.twit.tv/twit.xml',
             'theory of everything': 'https://www.npr.org/rss/podcast.php?id=510061',
             'this american life': 'http://feed.thisamericanlife.org/talpodcast',
+            'android authority': 'http://androidauthority.libsyn.com/rss',
             }
         return urls[podcast_name]
 
     def run(self, voice_command):
 
-        voice_command = ((voice_command.replace(self.keyword, '', 1)).strip()).lower()
+        voice_command = ((voice_command.lower()).replace(self.keyword, '', 1)).strip()
 
         logging.info("podcast command:" + voice_command)
 
@@ -300,6 +301,8 @@ class playPodcast(object):
         self.set_state("stopped")
         global podcast_url
         podcast_url = None
+
+        logging.info("looking for podcast: " + voice_command)
 
         try:
             feedUrl = self.get_url(voice_command)
