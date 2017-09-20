@@ -18,6 +18,7 @@ import datetime
 import logging
 import subprocess
 import paho.mqtt.publish as publish
+import traceback
 
 import actionbase
 
@@ -225,35 +226,29 @@ class PowerCommand(object):
 class Mosquitto(object):
     """Send MQTT commands"""
 
-    def __init__(self, say, keyword):
+    def __init__(self, say, keyword, topic, message):
         self.say = say
         self.keyword = keyword
         self.mqtt_host = "host ip address"
         self.mqtt_port = 1883
         self.mqtt_username = ""
         self.mqtt_password = ""
-        self.lights_topic = "livingroom/lights"
+        self.mqtt_topic = topic
+        self.mqtt_message = message
 
     def run(self, voice_command):
-        if (self.keyword == "lights on"):
-            self.say("lights on")
-            publish.single(self.lights_topic, payload="on",
-                                hostname=self.mqtt_host,
-                                port=self.mqtt_port,
-                                auth={'username':self.mqtt_username,
-                                        'password':self.mqtt_password})
 
-        elif (self.keyword == "lights off"):
-            self.say("lights off")
-            publish.single(self.lights_topic, payload="off",
-                                hostname=self.mqtt_host,
-                                port=self.mqtt_port,
-                                auth={'username':self.mqtt_username,
-                                        'password':self.mqtt_password})
-
-        else:
-            logging.error("Error identifying mqtt command.")
-            self.say("Sorry I didn't identify that command")
+        try:
+            publish.single(self.mqtt_topic, payload=self.mqtt_message,
+                       hostname=self.mqtt_host,
+                       port=self.mqtt_port,
+                       auth={'username':self.mqtt_username,
+                       'password':self.mqtt_password})
+            self.say(voice_command)
+            logging.info("MQTT Command received: " + self.mqtt_topic + " " +
+			self.mqtt_message )
+        except Exception as e:
+            logging.error("MQTT error: " + traceback.format_exc())
 
 # =========================================
 # Makers! Implement your own actions here.
@@ -283,8 +278,8 @@ def make_actor(say):
 
     actor.add_keyword(_('power off'), PowerCommand(say, 'shutdown'))
     actor.add_keyword(_('reboot'), PowerCommand(say, 'reboot'))
-    actor.add_keyword(_('lights on'), Mosquitto(say, 'lights on'))
-    actor.add_keyword(_('lights off'), Mosquitto(say, 'lights off'))
+    actor.add_keyword(_('lights on'), Mosquitto(say, 'lights on', 'livingroom/lights', 'on'))
+    actor.add_keyword(_('lights off'), Mosquitto(say, 'lights off', 'livingroom/lights', 'off'))
 
     return actor
 
