@@ -22,6 +22,7 @@ import time
 import feedparser
 import random
 import threading
+import RPi.GPIO as gpio
 
 import actionbase
 
@@ -259,6 +260,20 @@ class playPodcast(object):
             }
         return urls[podcast_name]
 
+    def stop(self):
+        podcastPlayer.stop()
+        self.set_state("stopped")
+
+    def wait_for_button(self):
+        logging.info("waiting for button press to resume")
+        gpio.setmode(gpio.BCM)
+        gpio.setup(23, gpio.IN)
+        while True:
+            if gpio.input(23):
+                self.stop()
+                break
+            time.sleep(0.1)
+
     def run(self, voice_command):
 
         voice_command = ((voice_command.lower()).replace(self.keyword, '', 1)).strip()
@@ -266,10 +281,7 @@ class playPodcast(object):
         logging.info("podcast command:" + voice_command)
 
         if (voice_command == "stop") or (voice_command == "off"):
-
-            logging.info("podcast stopped")
-            podcastPlayer.stop()
-            self.set_state("stopped")
+            self.stop()
             return
 
         if voice_command == "pause":
@@ -341,6 +353,9 @@ class playPodcast(object):
            self.say("Sorry error playing " + podcast)
            self.set_state("stopped")
         self.set_state("playing")
+
+        # Uncomment the following line if you want to use a voice trigger to start the radio and the button to stop it, radio will not pause and resume
+        # self.wait_for_button()
 
     def pause():
         podcastState = playPodcast.get_state()
